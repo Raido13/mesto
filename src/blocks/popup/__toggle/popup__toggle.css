@@ -1,0 +1,30 @@
+.popup__toggle {
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  cursor: pointer;
+  background-image: url('../../../images/Close-Icon_default.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  background-size: 32px;
+  background-color: inherit;
+}
+
+/*при наведении на кнопку закрыть изображение становится прозрачнее на 40%*/
+.popup__toggle:hover {
+  opacity: .6;
+  transition: 30ms;
+}
+
+@media screen and (max-width: 660px) {
+  .popup__toggle {
+    right: 0;
+    top: -36px;
+    width: 20px;
+    height: 20px;
+    background-size: 20px;
+  }
+}

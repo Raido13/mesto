@@ -1,0 +1,21 @@
+.profile__username-field {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  align-items: baseline;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 960px) {
+  .profile__username-field {
+    padding-left: 42px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .profile__username-field {
+    max-width: 282px;
+    gap: 10px;
+    padding-left: 28px;
+  }
+}

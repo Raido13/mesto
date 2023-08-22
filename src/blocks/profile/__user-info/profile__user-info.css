@@ -1,0 +1,17 @@
+.profile__user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 30px;
+  max-width: 50%;
+}
+
+@media screen and (max-width: 960px) {
+  .profile__user-info {
+    justify-content: center;
+    flex-direction: column;
+    gap: 26px;
+    max-width: 100%;
+  }
+}

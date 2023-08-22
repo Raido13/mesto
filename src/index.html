@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Проект №3. Яндекс.Практикум, направление: Веб-разработчик+"
+    />
+    <meta name="keywords" content="Проект: Место" />
+    <meta name="author" content="Андрей Ерофеев" />
+    <title>Проект: Место</title>
+  </head>
+  <body class="page">
+    <section
+      class="popup popup__user-avatar"
+      aria-label="попап-элемент Обновить аватар"
+    >
+      <div class="popup__container">
+        <button
+          type="button"
+          class="popup__toggle"
+          name="toggle-user-avatar-form"
+          aria-label="Кнопка Закрыть форму"
+        ></button>
+        <div class="popup__main-container">
+          <h2 class="popup__heading">Обновить аватар</h2>
+          <form
+            class="popup__form popup__user-avatar-form"
+            name="user-avatar-form"
+            novalidate
+          >
+            <input
+              type="url"
+              id="avatar-link-input"
+              class="popup__item popup__item_input_avatar-link"
+              name="avatar-link"
+              placeholder="Ссылка на картинку"
+              required
+            />
+            <span class="popup__input-error avatar-link-input-error"></span>
+            <button
+              type="submit"
+              class="popup__submit-button popup__submit-button-avatar-link"
+              name="submit-button-avatar-link"
+              aria-label="Кнопка Сохранить форму"
+            >
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section
+      class="popup popup__user-data"
+      aria-label="попап-элемент Редактирование профиля"
+    >
+      <div class="popup__container">
+        <button
+          type="button"
+          class="popup__toggle"
+          name="toggle-user-data-form"
+          aria-label="Кнопка Закрыть форму"
+        ></button>
+        <div class="popup__main-container">
+          <h2 class="popup__heading">Редактировать профиль</h2>
+          <form
+            class="popup__form popup__user-data-form"
+            name="user-data-form"
+            novalidate
+          >
+            <input
+              type="text"
+              id="username-input"
+              class="popup__item popup__item_input_username"
+              name="username"
+              placeholder="Жак-Ив Кусто"
+              required
+              minlength="2"
+              maxlength="40"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+            />
+            <span class="popup__input-error username-input-error"></span>
+            <input
+              type="text"
+              id="occupation-input"
+              class="popup__item popup__item_input_occupation"
+              name="occupation"
+              placeholder="Исследователь океана"
+              required
+              minlength="2"
+              maxlength="200"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+            />
+            <span class="popup__input-error occupation-input-error"></span>
+            <button
+              type="submit"
+              class="popup__submit-button popup__submit-button-user-data"
+              name="submit-button-user-data"
+              aria-label="Кнопка Сохранить форму"
+            >
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section
+      class="popup popup__add-picture"
+      aria-label="попап-элемент Добавление картинки"
+    >
+      <div class="popup__container">
+        <button
+          type="button"
+          class="popup__toggle"
+          name="toggle-add-picture-form"
+          aria-label="Кнопка Закрыть форму"
+        ></button>
+        <div class="popup__main-container">
+          <h2 class="popup__heading">Новое место</h2>
+          <form
+            class="popup__form popup__add-picture-form"
+            name="add-picture-form"
+            novalidate
+          >
+            <input
+              type="text"
+              id="picture-title-input"
+              class="popup__item popup__item_input_picture-title"
+              name="picture-title"
+              placeholder="Название"
+              required
+              minlength="2"
+              maxlength="30"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+            />
+            <span class="popup__input-error picture-title-input-error"></span>
+            <input
+              type="url"
+              id="picture-link-input"
+              class="popup__item popup__item_input_picture-link"
+              name="picture-link"
+              placeholder="Ссылка на картинку"
+              required
+            />
+            <span class="popup__input-error picture-link-input-error"></span>
+            <button
+              type="submit"
+              class="popup__submit-button popup__submit-button-add-picture"
+              name="submit-button"
+              aria-label="Кнопка Сохранить форму"
+            >
+              Создать
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section
+      class="popup popup__delete-picture"
+      aria-label="попап-элемент Удаление картинки"
+    >
+      <div class="popup__container">
+        <button
+          type="button"
+          class="popup__toggle"
+          name="toggle-delete-picture-form"
+          aria-label="Кнопка Закрыть форму"
+        ></button>
+        <div class="popup__main-container">
+          <h2 class="popup__heading">Вы уверены?</h2>
+          <form
+            class="popup__form popup__delete-picture-form"
+            name="delete-picture-form"
+            novalidate
+          >
+            <button
+              type="submit"
+              class="popup__submit-button popup__submit-button-delete-picture"
+              name="submit-button-delete-picture"
+              aria-label="Кнопка Удалить картинку"
+            >
+              Да
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section class="popup popup__picture-form">
+      <div class="popup__container">
+        <button
+          type="button"
+          class="popup__toggle"
+          name="toggle-picture"
+          aria-label="Кнопка Закрыть изображение"
+        ></button>
+        <img class="popup__picture-element photo-grid__big-photo" />
+        <h3 class="popup__picture-caption photo-grid__big-photo-caption"></h3>
+      </div>
+    </section>
+    <header class="header">
+      <img
+        class="logo"
+        src="<%=require('./images/Logo-Mesto_white.svg')%>"
+        alt="логотип Место"
+      />
+    </header>
+    <main class="content">
+      <section class="profile" aria-label="Данные профиля пользователя">
+        <div class="profile__user-info">
+          <button
+            type="button"
+            class="profile__avatar"
+            name="avatar-add-button"
+            aria-label="Кнопка Изменить аватар"
+          ></button>
+          <div class="profile__info">
+            <div class="profile__username-field">
+              <h1 class="profile__username"></h1>
+              <button
+                type="button"
+                class="profile__edit-button"
+                name="edit-button"
+                aria-label="Кнопка Редактировать профиль"
+              ></button>
+            </div>
+            <p class="profile__occupation"></p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="profile__add-button"
+          name="add-button"
+          aria-label="Кнопка Добавить изображение"
+        ></button>
+      </section>
+      <section
+        class="photo-grid"
+        aria-label="Фотографии пользователя"
+      ></section>
+    </main>
+    <footer class="footer">
+      <p class="footer__copyright">© 2020 Mesto Russia</p>
+    </footer>
+    <template id="photo-card-template">
+      <article class="photo-grid__photo-card">
+        <img class="photo-grid__photo" />
+        <div class="photo-grid__photo-caption">
+          <h2 class="photo-grid__caption-text"></h2>
+          <div class="photo-grid__like-field">
+            <button
+              type="button"
+              class="photo-grid__like-button"
+              name="like-button"
+              aria-label="Кнопка Нравится"
+            ></button>
+            <p class="photo-grid__likes-count">0</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="photo-grid__delete-button"
+          name="delete-button"
+          aria-label="Кнопка Удалить картинку"
+        ></button>
+      </article>
+    </template>
+  </body>
+</html>

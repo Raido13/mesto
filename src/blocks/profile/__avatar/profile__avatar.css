@@ -1,0 +1,36 @@
+.profile__avatar {
+  appearance: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  width: 120px;
+  height: 120px;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 60px;
+  position: relative;
+}
+
+.profile__avatar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  transition: 30ms;
+  background-size: 100% 100%;
+  background: url('../../../images/Avatar-change.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0;
+}
+
+.profile__avatar:hover::before {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, .8);
+}

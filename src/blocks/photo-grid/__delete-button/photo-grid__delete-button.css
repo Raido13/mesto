@@ -1,0 +1,21 @@
+.photo-grid__delete-button {
+  visibility: hidden;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  margin: 0;
+  padding: 0;
+  width: 18px;
+  height: 19px;
+  cursor: pointer;
+  background-image: url('../../../images/Delete-icon.svg');
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+/*при наведении на кнопку изображение становится прозрачнее на 50% с задержком 30мс*/
+.photo-grid__delete-button:hover {
+  opacity: .5;
+  transition: 30ms;
+}
