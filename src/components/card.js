@@ -4,16 +4,16 @@
 
 import {storage, popupDeleteCard} from '../utils/constants';
 import PopupWithForm from './PopupWithForm';
-import api from '../pages/index'
+import {api} from '../pages/index'
 
 //класс добавления блока в DOM для новой фотографии и подключения к ней необходимых event и fetch
 export default class Card {
-  constructor({name, link, likes, _id, owner}, templateSelector, handleCardClick) {
-    this._name = name;
-    this._link = link;
-    this._likes = likes;
-    this._id = _id;
-    this._owner = owner;
+  constructor(card, templateSelector, handleCardClick) {
+    this._name = card.name;
+    this._link = card.link;
+    this._likes = card.likes;
+    this._id = card._id;
+    this._owner = card.owner;
     this._templateSelector = templateSelector;
     this._handleCardClick = handleCardClick;
   }
@@ -24,7 +24,7 @@ export default class Card {
 
   generate() {
 //сохраняем копию темплейта в элемент карточки
-    this._template = this._getTemplate();
+    this._template = this._getTemplate().content;
 //создаём необходимые переменные
     this._pictureElement = this._template.querySelector('.photo-grid__photo');
     this._likeButtonElement = this._template.querySelector('.photo-grid__like-button');
@@ -41,19 +41,18 @@ export default class Card {
 //добавляем слушатели событий
     this._setEventListeners();
 //приводим карточку к базовому состоянию до добавления в разметку
-    this._showLikes();
     this._checkMyLike();
-    this._activateLikeButton();
 //возвращаем раметку карточки
+    // console.log(this._link, this._name, this._id, this._likes, this._owner);
     return this._template;
   }
 //метод отображения на карточке количества лайков
   _showLikes() {
-    this._likesCounter.textContent = this._likes.lenght;
+    this._likesCounter.textContent = this._likes.length;
   }
 //метод проверки, есть ли собственный лайк на карточке
   _checkMyLike() {
-    const condition = this.likes.find(like => like._id === storage.userID);
+    const condition = this._likes.find(like => like._id == storage.userID);
     condition
       ? this._likeButtonElement.classList.add('photo-grid__like-button_active')
       : this._likeButtonElement.classList.remove('photo-grid__like-button_active');
@@ -63,23 +62,13 @@ export default class Card {
 //метод отправки запроса на сервер о состоянии кнопки лайка карточки
   _activateLikeButton() {
     const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
-    return condition
-      ? api.removeLike(this._id)
-        .then(() => {
-          this._showLikes();
-          this._checkMyLike();
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-      : api.addLike(this._id)
-        .then(() => {
-          this._showLikes();
-          this._checkMyLike();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    api.changeLike(this._id, condition)
+      .then(() => {
+        this._checkMyLike();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
 //метод подготовки к открытию попапа с подтверждением удаления элемента
   _deletePopupOpen() {

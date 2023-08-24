@@ -7,7 +7,6 @@ import PopupWithForm from '../components/PopupWithForm.js';
 import PopupWithImage from '../components/PopupWithImage.js';
 import Section from '../components/Section.js';
 import UserInfo from '../components/UserInfo.js';
-import storage from '../utils/constants';
 import {
   options,
   formSelectors,
@@ -56,7 +55,7 @@ const initialCardList = new Section({
     const card = new Card(
       item,
       cardTemplateSelector,
-      handleCardClick = () => {
+      function handleCardClick() {
         card._popup = new PopupWithImage(popupPicture, card._name, card._link);
         card._popup.open();
       }
@@ -72,7 +71,7 @@ const userInfo = new UserInfo(userDataSelectors);
 //добавляем event открытия модального окна к кнопке редактирования данных пользователя и сброс проверки валидации
 profileEditButton.addEventListener('click', () => {
 //  сюда вставить вызов функции открытия попапа экземпляра класса редактирования профайла
-  const popupEditUserdataForm = new PopupWithForm(popupEditUserdata, submitter = () => {
+  const popupEditUserdataForm = new PopupWithForm(popupEditUserdata, function submitter() {
     popupEditUserdataForm.renderLoading(true, userDataForm);
     api.patchProfileData({usernameInput, userOccupationInput})
       .then((userData) => {
@@ -86,11 +85,8 @@ profileEditButton.addEventListener('click', () => {
       .finally(() => {
         popupEditUserdataForm.renderLoading(false, userDataForm);
       });
-  }, autofill = (inputElements, userData) => {
-      inputElements.usernameInput.value = userData.userName;
-      inputElements.userOccupationInput.value = userData.userOccupation;
   })
-  popupEditUserdataForm.autofill({usernameInput, userOccupationInput}, userInfo.getUserInfo);
+  popupEditUserdataForm.autofill({usernameInput, userOccupationInput}, userInfo.getUserInfo());
   userFormValidator.reloadValidation(); //подумать, как обойтись без этой функции
   popupEditUserdataForm.open();
 });
@@ -100,14 +96,14 @@ addPictureButton.addEventListener('click', function() {
   pictureTitleInput.value = "";
   pictureLinkInput.value = "";
 //  сюда вставить вызов функции открытия попапа экземпляра класса добавления фотографии
-  const popupAddCardForm = new PopupWithForm(popupAddCard, submitter = () => {
+  const popupAddCardForm = new PopupWithForm(popupAddCard, function submitter() {
     popupAddCardForm.renderLoading(true, addPictureForm);
     api.postNewCard(pictureTitleInput, pictureLinkInput)
       .then((newCard) => {
         const card = new Card (
           newCard, 
           cardTemplateSelector,
-          handleCardClick = () => {
+          function handleCardClick() {
             this._popup = new PopupWithImage(popupPicture, this._name, this._link);
             this._popup.open();
           }
@@ -131,7 +127,7 @@ addPictureButton.addEventListener('click', function() {
 avatarEditButton.addEventListener('click', function() {
   userAvatarLinkInput.value = "";
 //  сюда вставить вызов функции открытия попапа экземпляра класса изменения аватара
-  const popupEditAvatarForm = new PopupWithForm(popupEditAvatar, submitter = () => {
+  const popupEditAvatarForm = new PopupWithForm(popupEditAvatar, function submitter() {
     popupEditAvatarForm.renderLoading(true, userAvatarForm);
     api.patchAvatar(userAvatarLinkInput)
       .then((userData) => {
@@ -159,9 +155,9 @@ Promise.all([
       userName: userData.name,
       userOccupation: userData.about
     });
+    storage.userID = userData._id;
     userInfo.setUserAvatar(userData.avatar);
     initialCardList.renderItems(initialCards);
-    storage.userID = userData._id;
   })
   .catch((err) => {
     console.log(err);

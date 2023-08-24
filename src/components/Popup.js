@@ -1,16 +1,23 @@
 export default class Popup {
   constructor(popup) {
     this._popup = popup;
+    this._closeBtn = this._popup.querySelector('.popup__toggle');
   }
 
   open() {
     this._popup.classList.add('popup_opened');
-    setEventListeners();
+    this.setEventListeners();
   }
 
   close() {
     this._popup.classList.remove('popup_opened');
-    delEventListeners();
+    this.delEventListeners();
+  }
+
+  autofill(inputElements, userData) {
+    console.log(inputElements, userData.userName)
+      inputElements.usernameInput.value = userData.userName;
+      inputElements.userOccupationInput.value = userData.userOccupation;
   }
 
   _handleEscClose(e) {
@@ -22,15 +29,15 @@ export default class Popup {
   }
 
   setEventListeners() {
-    this._popup.closest('.popup__toggle').addEventListener('click', this.close);
-    this._popup.addEventListener('mousedown', this._checkIfClickOnOverlay);
-    document.addEventListener('keydown', this._handleEscClose);
+    this._closeBtn.addEventListener('click', () => this.close());
+    this._popup.addEventListener('mousedown', e => this._checkIfClickOnOverlay(e));
+    document.addEventListener('keydown', e => this._handleEscClose(e));
   }
   
   delEventListeners() {
-    this._popup.closest('.popup__toggle').removeEventListener('click', this.close);
-    this._popup.removeEventListener('mousedown', this._checkIfClickOnOverlay);
-    document.removeEventListener('keydown', this._handleEscClose);
+    this._closeBtn.removeEventListener('click', () => this.close());
+    this._popup.removeEventListener('mousedown', e => this._checkIfClickOnOverlay(e));
+    document.removeEventListener('keydown', e => this._handleEscClose(e));
   }
 }
 
