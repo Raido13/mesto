@@ -15,7 +15,6 @@ export default class Popup {
   }
 
   autofill(inputElements, userData) {
-    console.log(inputElements, userData.userName)
       inputElements.usernameInput.value = userData.userName;
       inputElements.userOccupationInput.value = userData.userOccupation;
   }

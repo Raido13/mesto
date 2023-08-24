@@ -30,6 +30,7 @@ import {
   pictureLinkInput,
   profileUsername,
   profileOccupation,
+  popupDeleteCard,
   storage
 } from '../utils/constants.js';
 
@@ -58,6 +59,33 @@ const initialCardList = new Section({
       function handleCardClick() {
         card._popup = new PopupWithImage(popupPicture, card._name, card._link);
         card._popup.open();
+      },
+      //метод отправки запроса на сервер о состоянии кнопки лайка карточки
+      function activateLikeButton() {
+        const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
+        api.changeLike(this._id, condition)
+          .then((updatedCard) => {
+            this._likes = updatedCard.likes;
+            this._checkMyLike();
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      },
+      //метод подготовки к открытию попапа с подтверждением удаления элемента
+      function deletePopupOpen() {
+        storage.cardToDelete = {id: this._id, element: this._template};
+        this._popup = new PopupWithForm(popupDeleteCard, function submitter() {
+          api.deleteCard(storage.cardToDelete.id)
+          .then(() => {
+            storage.cardToDelete.element.remove();
+            this.close();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        });
+        this._popup.open();
       }
     );
     const cardElement = card.generate();
@@ -73,7 +101,7 @@ profileEditButton.addEventListener('click', () => {
 //  сюда вставить вызов функции открытия попапа экземпляра класса редактирования профайла
   const popupEditUserdataForm = new PopupWithForm(popupEditUserdata, function submitter() {
     popupEditUserdataForm.renderLoading(true, userDataForm);
-    api.patchProfileData({usernameInput, userOccupationInput})
+    api.patchProfileData({userName: usernameInput.value, userOccupation: userOccupationInput.value})
       .then((userData) => {
         profileUsername.textContent = userData.name;
         profileOccupation.textContent = userData.about;
@@ -98,7 +126,7 @@ addPictureButton.addEventListener('click', function() {
 //  сюда вставить вызов функции открытия попапа экземпляра класса добавления фотографии
   const popupAddCardForm = new PopupWithForm(popupAddCard, function submitter() {
     popupAddCardForm.renderLoading(true, addPictureForm);
-    api.postNewCard(pictureTitleInput, pictureLinkInput)
+    api.postNewCard({pictureTitle: pictureTitleInput.value, pictureLink: pictureLinkInput.value})
       .then((newCard) => {
         const card = new Card (
           newCard, 
@@ -106,13 +134,40 @@ addPictureButton.addEventListener('click', function() {
           function handleCardClick() {
             this._popup = new PopupWithImage(popupPicture, this._name, this._link);
             this._popup.open();
+          },
+          //метод отправки запроса на сервер о состоянии кнопки лайка карточки
+          function activateLikeButton() {
+            const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
+            api.changeLike(this._id, condition)
+              .then((updatedCard) => {
+                this._likes = updatedCard.likes;
+                this._checkMyLike();
+              })
+              .catch((err) => {
+                console.log(err);
+              })
+          },
+          //метод подготовки к открытию попапа с подтверждением удаления элемента
+          function deletePopupOpen() {
+            storage.cardToDelete = {id: this._id, element: this._template};
+            this._popup = new PopupWithForm(popupDeleteCard, function submitter() {
+              api.deleteCard(storage.cardToDelete.id)
+              .then(() => {
+                storage.cardToDelete.element.remove();
+                this.close();
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+            });
+            this._popup.open();
           }
         );
         const cardElement = card.generate();
         initialCardList.addItemToTop(cardElement);
         popupAddCardForm.close();
       })
-      .catch(() => {
+      .catch(err => {
         console.log(err);
       })
       .finally(() => {
@@ -129,7 +184,7 @@ avatarEditButton.addEventListener('click', function() {
 //  сюда вставить вызов функции открытия попапа экземпляра класса изменения аватара
   const popupEditAvatarForm = new PopupWithForm(popupEditAvatar, function submitter() {
     popupEditAvatarForm.renderLoading(true, userAvatarForm);
-    api.patchAvatar(userAvatarLinkInput)
+    api.patchAvatar(userAvatarLinkInput.value)
       .then((userData) => {
         userInfo.setUserAvatar(userData.avatar); 
         popupEditAvatarForm.close();
