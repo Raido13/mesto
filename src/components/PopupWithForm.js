@@ -1,13 +1,12 @@
 import Popup from './Popup';
-import Api from './api';
-import FormValidator from './FormValidator';
 
 export default class PopupWithForm extends Popup {
-  constructor(popup, callback) {
+  constructor(popup, submitter, autofill) {
     super(popup);
-    this._callback = callback;
+    this._submitter = submitter;
     this._form = popup.querySelector('.popup__form');
     this._inputList = Array.from(popup.querySelectorAll('.popup__item'));
+    this._autofill = autofill;
   }
 
   _getInputValues() {
@@ -19,12 +18,17 @@ export default class PopupWithForm extends Popup {
     super.close();
   }
 
+  renderLoading(isLoading, formElement) {
+    const submitButton = formElement.querySelector('.popup__submit-button');
+    if(isLoading) {
+      submitButton.textContent = 'Сохранение...';
+    } else {
+      submitButton.textContent = 'Сохранить';
+    }
+  }
+
   setEventListeners() {
-    this._form.addEventListener('submit', e => {
-      e.preventDefault();
-      const data = this._getInputValues();
-      
-    })
+    this._form.addEventListener('submit', this._submitter);
     super.setEventListeners();
   }
 }

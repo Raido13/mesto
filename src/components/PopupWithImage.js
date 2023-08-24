@@ -7,6 +7,7 @@ export default class PopupWithImage extends Popup {
     this._name = name;
     this._link = link;
   }
+
   open() {
     popupPictureImage.src = this._link;
     popupPictureImage.alt = this._name;
@@ -14,6 +15,7 @@ export default class PopupWithImage extends Popup {
 
     super.open();
   }
+  
   close() {
     popupPictureImage.src = '';
     popupPictureImage.alt = '';

@@ -2,40 +2,42 @@
 
 //импортируем необходимые функции и переменные
 
-import {popupPictureForm, storage, popupDeletePictureForm} from '../utils/constants';
-import Popup from './Popup';
-import PopupWithImage from './PopupWithImage';
+import {storage, popupDeleteCard} from '../utils/constants';
+import PopupWithForm from './PopupWithForm';
+import api from '../pages/index'
 
 //класс добавления блока в DOM для новой фотографии и подключения к ней необходимых event и fetch
 export default class Card {
-  constructor(name, link, likes, _id, owner) {
+  constructor({name, link, likes, _id, owner}, templateSelector, handleCardClick) {
     this._name = name;
     this._link = link;
     this._likes = likes;
     this._id = _id;
     this._owner = owner;
+    this._templateSelector = templateSelector;
+    this._handleCardClick = handleCardClick;
   }
 //создаём копию темплейта
-  _getElement() {
-    return document.querySelector('.photo-grid__photo-card').cloneNode(true);
+  _getTemplate() {
+    return document.querySelector(this._templateSelector).cloneNode(true);
   }
 
   generate() {
 //сохраняем копию темплейта в элемент карточки
-    this._element = this._getElement();
+    this._template = this._getTemplate();
 //создаём необходимые переменные
-    this._pictureElement = this._element.querySelector('.photo-grid__photo');
-    this._likeButtonElement = this._element.querySelector('.photo-grid__like-button');
-    this._likesCounter = this._element.querySelector('.photo-grid__likes-count');
-    this._deleteButtonElement = this._element.querySelector('.photo-grid__delete-button');
-    this._captionTextButtonElement = this._element.querySelector('.photo-grid__caption-text');
-    const condition = (this._owner._id == storage.userID);
+    this._pictureElement = this._template.querySelector('.photo-grid__photo');
+    this._likeButtonElement = this._template.querySelector('.photo-grid__like-button');
+    this._likesCounter = this._template.querySelector('.photo-grid__likes-count');
+    this._deleteButtonElement = this._template.querySelector('.photo-grid__delete-button');
+    this._captionTextButtonElement = this._template.querySelector('.photo-grid__caption-text');
+    const condition = (this._owner._id === storage.userID);
 //проверяем является ли пользователь владельцем карточки
     if(condition) deleteButtonElement.classList.add('photo-grid__delete-button_active');
 //задаём параметры для отображения элемента карточки
-    pictureElement.src = this._link;
-    pictureElement.alt = this._name;
-    captionTextButtonElement.textContent = this._name;
+    this._pictureElement.src = this._link;
+    this._pictureElement.alt = this._name;
+    this._captionTextButtonElement.textContent = this._name;
 //добавляем слушатели событий
     this._setEventListeners();
 //приводим карточку к базовому состоянию до добавления в разметку
@@ -43,7 +45,7 @@ export default class Card {
     this._checkMyLike();
     this._activateLikeButton();
 //возвращаем раметку карточки
-    return this._element;
+    return this._template;
   }
 //метод отображения на карточке количества лайков
   _showLikes() {
@@ -51,7 +53,7 @@ export default class Card {
   }
 //метод проверки, есть ли собственный лайк на карточке
   _checkMyLike() {
-    const condition = this.likes.find(like => like._id == storage.userID);
+    const condition = this.likes.find(like => like._id === storage.userID);
     condition
       ? this._likeButtonElement.classList.add('photo-grid__like-button_active')
       : this._likeButtonElement.classList.remove('photo-grid__like-button_active');
@@ -61,8 +63,8 @@ export default class Card {
 //метод отправки запроса на сервер о состоянии кнопки лайка карточки
   _activateLikeButton() {
     const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
-    condition
-      ? Api.removeLike(this._id)
+    return condition
+      ? api.removeLike(this._id)
         .then(() => {
           this._showLikes();
           this._checkMyLike();
@@ -70,7 +72,7 @@ export default class Card {
         .catch((err) => {
           console.log(err);
         })
-      : Api.addLike(this._id)
+      : api.addLike(this._id)
         .then(() => {
           this._showLikes();
           this._checkMyLike();
@@ -79,23 +81,20 @@ export default class Card {
           console.log(err);
         });
   }
-//метод подготовки к открытию попапа с картинкой
-  _imageOpenPopup() {
-    new PopupWithImage(popupPictureForm, this._name, this._link);
-  }
-//метод подготовки к закрытию попапа с картинкой
-  _imageClosePopup() {
-    PopupWithImage.close();
-  }
 //метод подготовки к открытию попапа с подтверждением удаления элемента
   _deletePopupOpen() {
-    storage.cardToDelete = [this._id, this._element]
-
-    Popup.open(popupDeletePictureForm);
-  }
-//метод закрытия попапа с подтверждением удаления элемента
-  _deleteCloseOpen() {
-    Popup.close(popupDeletePictureForm);
+    storage.cardToDelete = {id: this._id, domElement: this._template};
+    this._popup = new PopupWithForm(popupDeleteCard, submitter = () => {
+      api.deleteCard(storage.cardToDelete.id)
+      .then(() => {
+        storage.cardToDelete.domElement.remove();
+        this.close();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    });
+    this._popup.open();
   }
 //метод расстановки слушателей на элементы связанные с карточкой
   _setEventListeners() {
@@ -103,17 +102,11 @@ export default class Card {
       this._activateLikeButton();
     })
     this._pictureElement.addEventListener('click', () => {
-      this._imageOpenPopup();
+      this._handleCardClick();
     })
     this._deleteButtonElement.addEventListener('click', () => {
       this._deletePopupOpen();
     })
-    // popupDeletePictureForm.closest('.popup__toggle').addEventListener('click', () => {
-    //   this._deleteCloseOpen();
-    // })
-    // popupPictureForm.closest('.popup__toggle').addEventListener('click', () => {
-    //   this._imageClosePopup();
-    // })
   }
 }
 

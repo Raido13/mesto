@@ -15,6 +15,7 @@ export const content = page.querySelector('.content');
 export const userDataForm = page.querySelector('.popup__user-data-form');
 export const addPictureForm = page.querySelector('.popup__add-picture-form');
 export const userAvatarForm = page.querySelector('.popup__user-avatar-form');
+export const deletePictureForm = page.querySelector('.popup__delete-picture-form');
 
 export const usernameInput = userDataForm.querySelector('.popup__item_input_username');
 export const userOccupationInput = userDataForm.querySelector('.popup__item_input_occupation');
@@ -28,13 +29,23 @@ export const avatarEditButton = content.querySelector('.profile__avatar');
 
 export const photoGrid = content.querySelector('.photo-grid');
 
-export const popupPictureForm = page.querySelector('.popup__picture-form');
-export const popupPictureImage = popupPictureForm.querySelector('.popup__picture-element');
-export const popupPictureCaption = popupPictureForm.querySelector('.popup__picture-caption');
+export const popupPicture = page.querySelector('.popup__picture-form');
+export const popupAddCard = page.querySelector('.popup__add-picture');
+export const popupEditUserdata = page.querySelector('.popup__user-data');
+export const popupEditAvatar = page.querySelector('.popup__user-avatar');
+export const popupDeleteCard = page.querySelector('.popup__delete-picture');
+
+export const popupPictureImage = popupPicture.querySelector('.popup__picture-element');
+export const popupPictureCaption = popupPicture.querySelector('.popup__picture-caption');
 
 export const popupDeletePictureForm = page.querySelector('.popup__delete-picture');
 
 export const popupToggles = page.querySelectorAll('.popup__toggle');
+
+export const profileUsername = page.querySelector('.profile__username');
+export const profileOccupation = page.querySelector('.profile__occupation');
+
+export const cardTemplateSelector = '#photo-card-template';
 
 export const formSelectors = {
   inputSelector: '.popup__item',
@@ -54,5 +65,5 @@ export const userDataSelectors = {
 
 export const storage = {
   userID: '',
-  cardToDelete: []
+  cardToDelete: {}
 };

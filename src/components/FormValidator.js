@@ -69,13 +69,13 @@ export default class FormValidator {
     this._setEventListeners();
   }
 
-/*  reloadValidation() {
+  reloadValidation() {
     this._inputList.forEach(inputElement => {
       inputElement.setCustomValidity("");
       this._hideInputError(inputElement);
     });
     this._toggleButtonState;
-  } */
+  }
 }
 
 /*
