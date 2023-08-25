@@ -8,13 +8,13 @@ import {storage} from '../utils/constants';
 
 //класс добавления блока в DOM для новой фотографии и подключения к ней необходимых event и fetch
 export default class Card {
-  constructor(card, templateSelector, handleCardClick, activateLikeButton, deletePopupOpen) {
-    this._name = card.name;
-    this._link = card.link;
-    this._likes = card.likes;
-    this._id = card._id;
-    this._owner = card.owner;
-    this._templateSelector = templateSelector;
+  constructor({item, cardTemplateSelector, handleCardClick, activateLikeButton, deletePopupOpen}) {
+    this._name = item.name;
+    this._link = item.link;
+    this._likes = item.likes;
+    this._id = item._id;
+    this._owner = item.owner;
+    this._templateSelector = cardTemplateSelector;
     this._handleCardClick = handleCardClick;
     this._activateLikeButton = activateLikeButton;
     this._deletePopupOpen = deletePopupOpen;
@@ -63,13 +63,15 @@ export default class Card {
 //метод расстановки слушателей на элементы связанные с карточкой
   _setEventListeners() {
     this._likeButtonElement.addEventListener('click', () => {
-      this._activateLikeButton();
+      const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
+      this._activateLikeButton(this._id, condition, this._likes, this._checkMyLike);
     })
     this._pictureElement.addEventListener('click', () => {
-      this._handleCardClick();
+      this._handleCardClick(this._link, this._name);
     })
     this._deleteButtonElement.addEventListener('click', () => {
-      this._deletePopupOpen();
+      const cardToDelete = {id: this._id, element: this._template};
+      this._deletePopupOpen(cardToDelete);
     })
   }
 }

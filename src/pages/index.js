@@ -50,44 +50,41 @@ userFormValidator.enableValidation();
 const avatarFormValidator = new FormValidator(formSelectors, userAvatarForm);
 avatarFormValidator.enableValidation();
 
+const popupWithImage = new PopupWithImage(popupPicture);
+
 //создаём экземпляр класса Section для загрузки на сайт карточек с фотографиями
 const initialCardList = new Section({
   renderer: item => {
-    const card = new Card(
+    const card = new Card({
       item,
       cardTemplateSelector,
-      function handleCardClick() {
-        card._popup = new PopupWithImage(popupPicture, card._name, card._link);
-        card._popup.open();
+      handleCardClick: (name, link) => {
+        popupWithImage.open(popupPicture, name, link);
       },
-      //метод отправки запроса на сервер о состоянии кнопки лайка карточки
-      function activateLikeButton() {
-        const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
-        api.changeLike(this._id, condition)
+      activateLikeButton: (id, condition, likes, checkMyLike) => {
+        api.changeLike(id, condition)
           .then((updatedCard) => {
-            this._likes = updatedCard.likes;
-            this._checkMyLike();
+            likes = updatedCard.likes;
+            checkMyLike();
           })
           .catch((err) => {
             console.log(err);
           })
       },
-      //метод подготовки к открытию попапа с подтверждением удаления элемента
-      function deletePopupOpen() {
-        storage.cardToDelete = {id: this._id, element: this._template};
-        this._popup = new PopupWithForm(popupDeleteCard, function submitter() {
-          api.deleteCard(storage.cardToDelete.id)
+      deletePopupOpen: cardToDelete => {
+        const popupDeleteCardForm = new PopupWithForm(popupDeleteCard, function submitter() {
+          api.deleteCard(cardToDelete.id)
           .then(() => {
-            storage.cardToDelete.element.remove();
-            this.close();
+            cardToDelete.element.remove();
+            popupDeleteCardForm.close();
           })
           .catch((err) => {
             console.log(err);
           });
         });
-        this._popup.open();
+        popupDeleteCardForm.open();
       }
-    );
+    });
     const cardElement = card.generate();
     initialCardList.addItemToBottom(cardElement);
   }
@@ -127,42 +124,38 @@ addPictureButton.addEventListener('click', function() {
   const popupAddCardForm = new PopupWithForm(popupAddCard, function submitter() {
     popupAddCardForm.renderLoading(true, addPictureForm);
     api.postNewCard({pictureTitle: pictureTitleInput.value, pictureLink: pictureLinkInput.value})
-      .then((newCard) => {
-        const card = new Card (
-          newCard, 
+      .then((item) => {
+        const card = new Card({
+          item,
           cardTemplateSelector,
-          function handleCardClick() {
-            this._popup = new PopupWithImage(popupPicture, this._name, this._link);
-            this._popup.open();
+          handleCardClick: (name, link) => {
+            console.log(name, link);
+            popupWithImage.open(popupPicture, name, link);
           },
-          //метод отправки запроса на сервер о состоянии кнопки лайка карточки
-          function activateLikeButton() {
-            const condition = this._likeButtonElement.classList.contains('photo-grid__like-button_active');
-            api.changeLike(this._id, condition)
+          activateLikeButton: (id, condition, likes, checkMyLike) => {
+            api.changeLike(id, condition, likes, checkMyLike)
               .then((updatedCard) => {
-                this._likes = updatedCard.likes;
-                this._checkMyLike();
+                likes = updatedCard.likes;
+                checkMyLike();
               })
               .catch((err) => {
                 console.log(err);
               })
           },
-          //метод подготовки к открытию попапа с подтверждением удаления элемента
-          function deletePopupOpen() {
-            storage.cardToDelete = {id: this._id, element: this._template};
-            this._popup = new PopupWithForm(popupDeleteCard, function submitter() {
-              api.deleteCard(storage.cardToDelete.id)
+          deletePopupOpen: cardToDelete => {
+            const popupDeleteCardForm = new PopupWithForm(popupDeleteCard, function submitter() {
+              api.deleteCard(cardToDelete.id)
               .then(() => {
-                storage.cardToDelete.element.remove();
-                this.close();
+                cardToDelete.element.remove();
+                popupDeleteCardForm.close();
               })
               .catch((err) => {
                 console.log(err);
               });
             });
-            this._popup.open();
+            popupDeleteCardForm.open();
           }
-        );
+        });
         const cardElement = card.generate();
         initialCardList.addItemToTop(cardElement);
         popupAddCardForm.close();
