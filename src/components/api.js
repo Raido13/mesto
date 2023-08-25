@@ -28,36 +28,36 @@ export default class Api {
   }
 
   //запрос к серверу на обновление данных профиля
-  patchProfileData({ userName, userOccupation }) {
+  patchProfileData(data) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        name: userName,
-        about: userOccupation
+        name: data[0],
+        about: data[1]
       })
     }).then((res) => this._getResponseData(res));
   }
 
   //запрос к серверу на обновление аватарки
-  patchAvatar(userAvatar) {
+  patchAvatar(data) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        avatar: userAvatar
+        avatar: data[0]
       })
     }).then((res) => this._getResponseData(res));
   }
 
   //запрос к серверу на добавление карточки
-  postNewCard({ pictureTitle, pictureLink }) {
+  postNewCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({
-        name: pictureTitle,
-        link: pictureLink
+        name: data[0],
+        link: data[1]
       })
     }).then((res) => this._getResponseData(res));
   }

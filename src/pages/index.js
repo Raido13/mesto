@@ -25,9 +25,6 @@ import {
   avatarEditButton,
   usernameInput,
   userOccupationInput,
-  userAvatarLinkInput,
-  pictureTitleInput,
-  pictureLinkInput,
   profileUsername,
   profileOccupation,
   popupDeleteCard,
@@ -50,7 +47,90 @@ userFormValidator.enableValidation();
 const avatarFormValidator = new FormValidator(formSelectors, userAvatarForm);
 avatarFormValidator.enableValidation();
 
+const popupAddCardForm = new PopupWithForm({
+  popup: popupAddCard,
+  submitter: data => {
+  popupAddCardForm.renderLoading(true, addPictureForm);
+  api.postNewCard(data)
+    .then((item) => {
+      const card = new Card({
+        item,
+        cardTemplateSelector,
+        handleCardClick: (name, link) => {
+          popupWithImage.open(name, link);
+        },
+        onLikePress: (id, condition) => {
+          return api.changeLike(id, condition);
+        },
+        deletePopupOpen: () => {
+          popupDeleteCardForm.open();
+        }
+      });
+      const cardElement = card.generate();
+      initialCardList.addItemToTop(cardElement);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+    .finally(() => {
+      popupAddCardForm.renderLoading(false, addPictureForm);
+      popupAddCardForm.close();
+    });
+  }
+})
+
+const popupEditUserdataForm = new PopupWithForm({
+  popup: popupEditUserdata,
+  submitter: data => {
+    popupEditUserdataForm.renderLoading(true, userDataForm);
+    api.patchProfileData(data)
+      .then((userData) => {
+        profileUsername.textContent = userData.name;
+        profileOccupation.textContent = userData.about;
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        popupEditUserdataForm.renderLoading(false, userDataForm);
+        popupEditUserdataForm.close();
+      });
+  }
+})
+
+const popupEditAvatarForm = new PopupWithForm({
+  popup: popupEditAvatar,
+  submitter: data => {
+    popupEditAvatarForm.renderLoading(true, userAvatarForm);
+    api.patchAvatar(data)
+      .then((userData) => {
+        userInfo.setUserAvatar(userData.avatar); 
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        popupEditAvatarForm.renderLoading(false, userAvatarForm);
+        popupEditAvatarForm.close();
+      });
+  }
+})
+
 const popupWithImage = new PopupWithImage(popupPicture);
+
+const popupDeleteCardForm = new PopupWithForm({
+  popup: popupDeleteCard,
+  submitter: () => {
+    return api.deleteCard(storage.cardToDelete.id)
+    .then(() => {
+      storage.cardToDelete.element.remove();
+      popupDeleteCardForm.close();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+});
 
 //создаём экземпляр класса Section для загрузки на сайт карточек с фотографиями
 const initialCardList = new Section({
@@ -59,29 +139,12 @@ const initialCardList = new Section({
       item,
       cardTemplateSelector,
       handleCardClick: (name, link) => {
-        popupWithImage.open(popupPicture, name, link);
+        popupWithImage.open(name, link);
       },
-      activateLikeButton: (id, condition, likes, checkMyLike) => {
-        api.changeLike(id, condition)
-          .then((updatedCard) => {
-            likes = updatedCard.likes;
-            checkMyLike();
-          })
-          .catch((err) => {
-            console.log(err);
-          })
+      onLikePress: (id, condition) => {
+        return api.changeLike(id, condition);
       },
-      deletePopupOpen: cardToDelete => {
-        const popupDeleteCardForm = new PopupWithForm(popupDeleteCard, function submitter() {
-          api.deleteCard(cardToDelete.id)
-          .then(() => {
-            cardToDelete.element.remove();
-            popupDeleteCardForm.close();
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        });
+      deletePopupOpen: () => {
         popupDeleteCardForm.open();
       }
     });
@@ -96,21 +159,6 @@ const userInfo = new UserInfo(userDataSelectors);
 //добавляем event открытия модального окна к кнопке редактирования данных пользователя и сброс проверки валидации
 profileEditButton.addEventListener('click', () => {
 //  сюда вставить вызов функции открытия попапа экземпляра класса редактирования профайла
-  const popupEditUserdataForm = new PopupWithForm(popupEditUserdata, function submitter() {
-    popupEditUserdataForm.renderLoading(true, userDataForm);
-    api.patchProfileData({userName: usernameInput.value, userOccupation: userOccupationInput.value})
-      .then((userData) => {
-        profileUsername.textContent = userData.name;
-        profileOccupation.textContent = userData.about;
-        popupEditUserdataForm.close();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        popupEditUserdataForm.renderLoading(false, userDataForm);
-      });
-  })
   popupEditUserdataForm.autofill({usernameInput, userOccupationInput}, userInfo.getUserInfo());
   userFormValidator.reloadValidation(); //подумать, как обойтись без этой функции
   popupEditUserdataForm.open();
@@ -118,79 +166,16 @@ profileEditButton.addEventListener('click', () => {
 
 //добавляем event открытия модального окна к кнопке добавления новой фотографии и сброс проверки валидации
 addPictureButton.addEventListener('click', function() {
-  pictureTitleInput.value = "";
-  pictureLinkInput.value = "";
 //  сюда вставить вызов функции открытия попапа экземпляра класса добавления фотографии
-  const popupAddCardForm = new PopupWithForm(popupAddCard, function submitter() {
-    popupAddCardForm.renderLoading(true, addPictureForm);
-    api.postNewCard({pictureTitle: pictureTitleInput.value, pictureLink: pictureLinkInput.value})
-      .then((item) => {
-        const card = new Card({
-          item,
-          cardTemplateSelector,
-          handleCardClick: (name, link) => {
-            console.log(name, link);
-            popupWithImage.open(popupPicture, name, link);
-          },
-          activateLikeButton: (id, condition, likes, checkMyLike) => {
-            api.changeLike(id, condition, likes, checkMyLike)
-              .then((updatedCard) => {
-                likes = updatedCard.likes;
-                checkMyLike();
-              })
-              .catch((err) => {
-                console.log(err);
-              })
-          },
-          deletePopupOpen: cardToDelete => {
-            const popupDeleteCardForm = new PopupWithForm(popupDeleteCard, function submitter() {
-              api.deleteCard(cardToDelete.id)
-              .then(() => {
-                cardToDelete.element.remove();
-                popupDeleteCardForm.close();
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-            });
-            popupDeleteCardForm.open();
-          }
-        });
-        const cardElement = card.generate();
-        initialCardList.addItemToTop(cardElement);
-        popupAddCardForm.close();
-      })
-      .catch(err => {
-        console.log(err);
-      })
-      .finally(() => {
-        popupAddCardForm.renderLoading(false, addPictureForm);
-      });
-  })
   cardFormValidator.reloadValidation(); //подумать, как обойтись без этой функции
   popupAddCardForm.open();
 });
 
 //добавляем event открытия модального окна к кнопке изменения аватара и сброс проверки валидации
 avatarEditButton.addEventListener('click', function() {
-  userAvatarLinkInput.value = "";
 //  сюда вставить вызов функции открытия попапа экземпляра класса изменения аватара
-  const popupEditAvatarForm = new PopupWithForm(popupEditAvatar, function submitter() {
-    popupEditAvatarForm.renderLoading(true, userAvatarForm);
-    api.patchAvatar(userAvatarLinkInput.value)
-      .then((userData) => {
-        userInfo.setUserAvatar(userData.avatar); 
-        popupEditAvatarForm.close();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        popupEditAvatarForm.renderLoading(false, userAvatarForm);
-      });
-  })
-  popupEditAvatarForm.open();
   avatarFormValidator.reloadValidation(); //подумать, как обойтись без этой функции
+  popupEditAvatarForm.open();
 });
 
 //промис, при исполнении которого загружается информация на сайт и отрисовывается DOM при загрузке
