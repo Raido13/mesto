@@ -1,6 +1,2 @@
-.git
-.gitconfig
-.gitignore
-.ssh
 node_modules
 dist

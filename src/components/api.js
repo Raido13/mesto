@@ -5,7 +5,7 @@ export default class Api {
     this._headers = options.headers;
   }
 
-  //сохраняем в функцию стандартное правило при получении ответа от сервера
+  //сохраняем в метод стандартное правило при получении ответа от сервера
   _getResponseData(res) {
     if (res.ok) {
       return res.json();
@@ -13,83 +13,73 @@ export default class Api {
     return Promise.reject(`Ошибка: ${res.status}`);
   }
 
+  //сохраняем в метод fetch-запрос к серверу
+  _request(endpointUrl, options) {
+    return fetch(`${this._baseUrl}${endpointUrl}`, options).then(this._getResponseData);
+  }
+
   //запрос к серверу на получение данных профиля и аватарки
   getInitialUserData() {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return this._request('/users/me', {
       headers: this._headers
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //запрос к серверу на получение загруженных на сервер фотокарточек
   getInitialCards() {
-    return fetch(`${this._baseUrl}/cards`, {
+    return this._request('/cards', {
       headers: this._headers
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //запрос к серверу на обновление данных профиля
   patchProfileData(data) {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return this._request('/users/me', {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        name: data[0],
-        about: data[1]
+        name: data.name,
+        about: data.about
       })
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //запрос к серверу на обновление аватарки
   patchAvatar(data) {
-    return fetch(`${this._baseUrl}/users/me/avatar`, {
+    return this._request('/users/me/avatar', {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        avatar: data[0]
+        avatar: data.avatar
       })
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //запрос к серверу на добавление карточки
   postNewCard(data) {
-    return fetch(`${this._baseUrl}/cards`, {
+    return this._request('/cards', {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({
-        name: data[0],
-        link: data[1]
+        name: data.title,
+        link: data.picture
       })
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //запрос к серверу на удаление карточки
   deleteCard(cardId) {
-    return fetch(`${this._baseUrl}/cards/${cardId}`, {
+    return this._request(`/cards/${cardId}`, {
       method: "DELETE",
       headers: this._headers
-    }).then((res) => this._getResponseData(res));
+    });
   }
 
   //смена статуса лайка после взаимодействия
-  changeLike(cardID, condition) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardID}`, {
+  changeLike(cardId, condition) {
+    return this._request(`/cards/likes/${cardId}`, {
       method: condition ? 'DELETE' : 'PUT',
       headers: this._headers
-    }).then((res) => this._getResponseData(res));
+    });
   }
-  // //запрос на установку лайка карточки
-  // addLike(cardId) {
-  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-  //     method: "PUT",
-  //     headers: this._headers
-  //   }).then((res) => this._getResponseData(res));
-  // }
-
-  // //запрос на удаление лайка карточки
-  // removeLike(cardId) {
-  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-  //     method: "DELETE",
-  //     headers: this._headers
-  //   }).then((res) => this._getResponseData(res));
-  // }
 }

@@ -1,3 +1,4 @@
+//класс с данными пользователя
 export default class UserInfo {
   constructor(userDataSelectors) {
     this._userName = document.querySelector(userDataSelectors.userNameSelector);
@@ -5,17 +6,16 @@ export default class UserInfo {
     this._userAvatar = document.querySelector(userDataSelectors.userAvatarSelector);
   }
 
+  //метод получения данных пользователя из DOM
   getUserInfo() {
-    const userData = { userName: this._userName.textContent, userOccupation: this._userOccupation.textContent };
+    const userData = { name: this._userName.textContent, about: this._userOccupation.textContent };
     return userData;
   }
 
-  setUserInfo(userInfo) {
-    this._userName.textContent = userInfo.userName;
-    this._userOccupation.textContent = userInfo.userOccupation;
-  }
-
-  setUserAvatar(userAvatarLink) {
-    this._userAvatar.style.background = `center / cover no-repeat url('${userAvatarLink}')`;
+  //метод обновления данных пользователя, полученнных извне
+  setUserInfo({ name, about, avatar, _id }) {
+    this._userName.textContent = name;
+    this._userOccupation.textContent = about;
+    this._userAvatar.style.background = `center / cover no-repeat url('${avatar}')`;
   }
 }
